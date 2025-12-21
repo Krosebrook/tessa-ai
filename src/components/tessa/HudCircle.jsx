@@ -5,7 +5,7 @@ const HudCircle = ({ status, isSpeaking, isListening }) => {
 
   return (
     <div className="relative w-[300px] h-[300px] md:w-[450px] md:h-[450px] flex items-center justify-center pointer-events-none">
-      <style jsx>{`
+      <style>{`
         .ring {
           position: absolute;
           border-radius: 50%;
