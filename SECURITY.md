@@ -9,7 +9,7 @@ We take the security of Tessa AI seriously. If you discover a security vulnerabi
 **DO NOT** open a public issue for security vulnerabilities.
 
 Instead, please report security issues to:
-- **Email**: [Create a private security advisory on GitHub](https://github.com/Krosebrook/tessa-ai/security/advisories/new)
+- **GitHub Security Advisory**: [Create a private security advisory](https://github.com/Krosebrook/tessa-ai/security/advisories/new)
 - **Alternative**: Contact the maintainer [@Krosebrook](https://github.com/Krosebrook) directly
 
 ### What to Include

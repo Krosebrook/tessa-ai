@@ -99,7 +99,9 @@ const useTessaConversation = () => {
         content: userText
       });
       
-      const recentMessages = conversation.slice(-6).map(msg => ({
+      // Use configured context window size from config
+      const contextSize = 6; // TODO: Import from tessa.config.js
+      const recentMessages = conversation.slice(-contextSize).map(msg => ({
         role: msg.sender === 'user' ? 'user' : 'assistant',
         content: msg.text
       }));

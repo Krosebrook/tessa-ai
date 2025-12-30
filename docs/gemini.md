@@ -154,9 +154,9 @@ const response = await base44.integrations.Core.InvokeLLM({
 
 ### Cost Optimization
 
-Gemini pricing (example, check current rates):
-- **Input**: $0.075 per 1M tokens (Flash), $1.25 per 1M tokens (Pro)
-- **Output**: $0.30 per 1M tokens (Flash), $5.00 per 1M tokens (Pro)
+Gemini pricing (approximate, **check current rates at [Google AI Pricing](https://ai.google.dev/pricing)**):
+- **Input**: ~$0.075 per 1M tokens (Flash), ~$1.25 per 1M tokens (Pro)
+- **Output**: ~$0.30 per 1M tokens (Flash), ~$5.00 per 1M tokens (Pro)
 
 **Optimization Tips**:
 ```javascript
