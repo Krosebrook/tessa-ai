@@ -1,65 +1,115 @@
-# Tessa AI - Personal Voice Assistant
+# Tessa AI - Voice-Enabled Personal Assistant
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![React](https://img.shields.io/badge/React-18.2.0-blue.svg)](https://reactjs.org/)
-[![Vite](https://img.shields.io/badge/Vite-6.1.0-646CFF.svg)](https://vitejs.dev/)
+![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+![React](https://img.shields.io/badge/react-18.2.0-61dafb.svg)
+![Vite](https://img.shields.io/badge/vite-6.1.0-646cff.svg)
 
-> **Tessa** is an intelligent, voice-activated personal assistant built with React and powered by Base44 AI platform. Featuring real-time speech recognition, natural language processing, and a beautiful futuristic UI.
+Tessa is a futuristic, voice-enabled AI personal assistant built with React and powered by the Base44 platform. It features real-time speech recognition, natural language processing, and an immersive HUD-style interface with particle effects.
 
-## 🌟 Features
+## ✨ Features
 
-- **🎤 Voice Recognition**: Continuous speech recognition using Web Speech API
-- **🔊 Text-to-Speech**: Natural voice synthesis with customizable voice settings
-- **💬 Conversational AI**: Context-aware responses powered by LLM integration
-- **🎨 Beautiful UI**: Futuristic particle-based interface with animated HUD
-- **⚙️ Customizable**: Adjustable voice pitch, rate, volume, and preferred voice
-- **💾 Persistent Conversations**: Conversation history saved and restored
-- **🔐 Authentication**: Secure user authentication via Base44 platform
-- **📱 Responsive**: Works across desktop and mobile devices
+- 🎤 **Voice Interaction**: Real-time speech recognition and synthesis for natural conversations
+- 🤖 **AI-Powered**: Leverages LLM integration through Base44 platform for intelligent responses
+- 🎨 **Futuristic UI**: Cyberpunk-inspired interface with animated HUD, particle effects, and glassmorphism
+- ⚙️ **Customizable**: Adjust voice settings (pitch, rate, volume), preferred voice, and personal preferences
+- 💾 **Conversation Persistence**: Maintains conversation history across sessions
+- 🔐 **Secure Authentication**: Base44 SDK integration with JWT-based authentication
+- 📱 **Responsive Design**: Works across desktop and mobile devices
 
 ## 🏗️ Architecture
 
 ### Technology Stack
 
-- **Frontend Framework**: React 18.2
-- **Build Tool**: Vite 6.1
-- **Styling**: TailwindCSS 3.4 with custom animations
-- **UI Components**: Radix UI primitives with custom theming
-- **State Management**: React Context API + TanStack Query
-- **Routing**: React Router v6
-- **AI/Backend**: Base44 SDK for agents, entities, and LLM integrations
-- **Speech**: Web Speech API (SpeechRecognition & SpeechSynthesis)
+**Frontend**
+- **React 18.2** - UI framework with hooks and context
+- **Vite 6.1** - Build tool and dev server
+- **TailwindCSS 3.4** - Utility-first CSS framework
+- **Radix UI** - Unstyled, accessible component primitives
+
+**State Management**
+- **React Query (TanStack)** - Server state management and caching
+- **React Context** - Client state and authentication
+
+**APIs & Integrations**
+- **Base44 SDK** - Backend platform for auth, agents, and entities
+- **Web Speech API** - Native browser speech recognition and synthesis
+
+### Project Structure
+
+```
+tessa-ai/
+├── src/
+│   ├── api/                  # API client configuration
+│   │   └── base44Client.js   # Base44 SDK client setup
+│   ├── components/           # React components
+│   │   ├── tessa/           # Tessa-specific components
+│   │   │   ├── HudCircle.jsx          # Animated HUD visualization
+│   │   │   ├── ParticleBackground.jsx # 3D particle system
+│   │   │   ├── SettingsPanel.jsx      # User preferences UI
+│   │   │   └── TypingMessage.jsx      # Typing animation effect
+│   │   └── ui/              # Reusable UI primitives (Radix)
+│   ├── hooks/               # Custom React hooks
+│   ├── lib/                 # Utilities and context providers
+│   │   ├── AuthContext.jsx       # Authentication management
+│   │   ├── app-params.js         # URL/storage parameter handling
+│   │   ├── query-client.js       # React Query configuration
+│   │   ├── utils.js              # Utility functions
+│   │   ├── NavigationTracker.jsx # Route tracking
+│   │   └── VisualEditAgent.jsx   # Base44 visual editor
+│   ├── pages/               # Application pages
+│   │   └── Tessa.jsx        # Main assistant interface
+│   ├── App.jsx              # Root application component
+│   ├── Layout.jsx           # Global layout wrapper
+│   ├── main.jsx             # Application entry point
+│   └── index.css            # Global styles
+├── docs/                    # Documentation
+├── public/                  # Static assets
+├── package.json            # Dependencies and scripts
+├── vite.config.js          # Vite configuration
+├── tailwind.config.js      # TailwindCSS configuration
+└── eslint.config.js        # ESLint configuration
+```
 
 ### Core Components
 
-```
-src/
-├── api/                  # API client configuration
-│   └── base44Client.js  # Base44 SDK initialization
-├── components/
-│   ├── tessa/           # Tessa-specific components
-│   │   ├── HudCircle.jsx          # Animated status display
-│   │   ├── ParticleBackground.jsx # Visual effects
-│   │   ├── SettingsPanel.jsx      # User preferences
-│   │   └── TypingMessage.jsx      # Animated message display
-│   └── ui/              # Reusable UI components (49 components)
-├── lib/                 # Utilities and context providers
-│   ├── AuthContext.jsx  # Authentication state management
-│   ├── app-params.js    # Application parameter handling
-│   └── query-client.js  # TanStack Query configuration
-├── pages/
-│   └── Tessa.jsx        # Main assistant page
-├── App.jsx              # Root application component
-└── main.jsx             # Application entry point
-```
+#### 1. Tessa Page (`src/pages/Tessa.jsx`)
+Main interface managing:
+- Speech recognition lifecycle
+- Conversation state and history
+- LLM integration for responses
+- Voice synthesis with customizable settings
+- User preferences persistence
+
+#### 2. HUD Circle (`src/components/tessa/HudCircle.jsx`)
+Visual feedback system:
+- Animated concentric rings with rotation
+- Status indicators (listening, speaking, idle)
+- Pulsing core with dynamic colors
+- Pure CSS animations for performance
+
+#### 3. Settings Panel (`src/components/tessa/SettingsPanel.jsx`)
+User customization interface:
+- Voice selection and preview
+- Speech rate, pitch, and volume controls
+- Personal preferences (name, location, timezone)
+- Persistent storage via Base44 entities
+
+#### 4. Auth Context (`src/lib/AuthContext.jsx`)
+Authentication management:
+- JWT token handling
+- User session management
+- App public settings validation
+- Error handling and redirects
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-- **Node.js** 16+ and npm/yarn
-- **Base44 Account**: Sign up at [base44.com](https://base44.com)
-- **Modern Browser**: Chrome, Edge, or Safari (for Web Speech API)
+- **Node.js** >= 18.x
+- **npm** >= 9.x
+- **Base44 Account** - [Sign up at base44.com](https://base44.com)
+- **Modern Browser** with Web Speech API support (Chrome, Edge, Safari)
 
 ### Installation
 
@@ -75,217 +125,200 @@ src/
    ```
 
 3. **Configure environment variables**
-   
    Create a `.env` file in the root directory:
    ```env
    VITE_BASE44_APP_ID=your_app_id_here
    VITE_BASE44_FUNCTIONS_VERSION=prod
    ```
 
-4. **Start development server**
+4. **Start the development server**
    ```bash
    npm run dev
    ```
 
-5. **Open your browser**
-   
-   Navigate to `http://localhost:5173` (default Vite port)
+5. **Access the application**
+   Open your browser to `http://localhost:5173`
 
-### Environment Variables
+### Building for Production
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `VITE_BASE44_APP_ID` | Your Base44 application ID | Yes |
-| `VITE_BASE44_FUNCTIONS_VERSION` | Functions version (prod/dev) | Yes |
-| `BASE44_LEGACY_SDK_IMPORTS` | Enable legacy SDK imports | No |
+```bash
+# Build the application
+npm run build
 
-## 🎯 Usage
-
-### Basic Interaction
-
-1. **Launch the application** - Tessa will greet you automatically
-2. **Click the HUD circle or wait** - Tessa will start listening
-3. **Speak your request** - Use natural language
-4. **Tessa responds** - Both visually and audibly
-5. **Continue the conversation** - Context is maintained
-
-### Settings Configuration
-
-Click the **Settings** icon (⚙️) in the top-right to customize:
-
-- **Preferred Name**: How Tessa addresses you
-- **Location**: Your location for context-aware responses
-- **Voice Selection**: Choose from available system voices
-- **Speech Rate**: Adjust speaking speed (0.5x - 2.0x)
-- **Pitch**: Modify voice pitch (0.5 - 2.0)
-- **Volume**: Control output volume (0 - 1.0)
-
-### Example Conversations
-
-```
-User: "What's the weather like today?"
-Tessa: "I'd be happy to help! However, I need your location..."
-
-User: "Tell me a joke"
-Tessa: "Why did the AI go to school? To improve its learning!"
-
-User: "Set a reminder for tomorrow"
-Tessa: "I'll help you with that. What time tomorrow?"
+# Preview the production build
+npm run preview
 ```
 
-## 🔧 Development
+The built files will be in the `dist/` directory.
+
+## 📖 Usage
+
+### Initial Setup
+
+1. **Launch Tessa**: Navigate to the application in your browser
+2. **Grant Permissions**: Allow microphone access when prompted
+3. **Authentication**: Log in with your Base44 credentials (if auth is enabled)
+4. **Start Talking**: Tessa will greet you and begin listening
+
+### Voice Interaction
+
+- Tessa automatically starts listening after speaking
+- Speak naturally - the app uses continuous speech recognition
+- Responses are spoken back with text display
+- Conversation history is maintained throughout the session
+
+### Customizing Settings
+
+1. Click the **Settings** icon (⚙️) in the top-right corner
+2. Adjust voice parameters:
+   - **Speech Rate**: 0.5x to 2.0x (how fast Tessa speaks)
+   - **Pitch**: 0.5 to 2.0 (voice tone)
+   - **Volume**: 0.0 to 1.0
+   - **Voice**: Select from available system voices
+3. Set personal preferences:
+   - **Preferred Name**: How Tessa should address you
+   - **Location**: For context-aware responses
+   - **Timezone**: For time-based interactions
+4. Click **Save Settings** to persist changes
+
+## 🛠️ Development
 
 ### Available Scripts
 
-```bash
-# Development server with HMR
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
-
-# Lint code
-npm run lint
-
-# Fix linting issues
-npm run lint:fix
-
-# Type check (uses JSDoc types)
-npm run typecheck
-```
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Start development server with HMR |
+| `npm run build` | Build for production |
+| `npm run preview` | Preview production build locally |
+| `npm run lint` | Run ESLint (quiet mode) |
+| `npm run lint:fix` | Auto-fix linting issues |
+| `npm run typecheck` | Run TypeScript type checking |
 
 ### Code Style
 
-This project follows:
-- **ESLint** with React and React Hooks plugins
-- **Unused imports** detection and removal
-- **JSDoc** for type annotations
-- **Prettier-compatible** formatting (via ESLint)
+- **ESLint**: Enforces code quality and consistency
+- **Prettier**: (Recommended) Install as dev dependency for formatting
+- **Naming Conventions**:
+  - Components: PascalCase (e.g., `HudCircle.jsx`)
+  - Files: camelCase for utilities, kebab-case for configs
+  - Variables: camelCase
+  - Constants: UPPER_SNAKE_CASE
 
-### Adding New Components
+### Adding New Features
 
-1. Create component in appropriate directory
-2. Use existing UI components from `components/ui/`
-3. Follow React hooks best practices
-4. Add JSDoc comments for complex functions
-5. Run linter before committing
+1. **Create Feature Branch**
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
 
-## 🧪 Testing
+2. **Develop and Test**
+   - Add components in appropriate directories
+   - Follow existing patterns and conventions
+   - Test thoroughly in development mode
 
-*Testing framework setup is planned for future releases.*
+3. **Lint and Build**
+   ```bash
+   npm run lint:fix
+   npm run build
+   ```
 
-```bash
-# Run tests (coming soon)
-npm run test
-
-# Run tests in watch mode
-npm run test:watch
-
-# Generate coverage report
-npm run test:coverage
-```
-
-## 📦 Building for Production
-
-```bash
-# Create optimized production build
-npm run build
-
-# Output will be in dist/ directory
-# Deploy the contents of dist/ to your hosting provider
-```
-
-### Deployment Options
-
-- **Vercel**: Zero-config deployment (`vercel deploy`)
-- **Netlify**: Drag-and-drop or CLI (`netlify deploy`)
-- **GitHub Pages**: Via GitHub Actions
-- **Self-hosted**: Serve `dist/` with any static file server
+4. **Submit Pull Request**
+   - Clear description of changes
+   - Link to related issues
+   - Include screenshots for UI changes
 
 ## 🔒 Security
 
-### Best Practices Implemented
+### Best Practices
 
-- ✅ Environment variables for sensitive data
-- ✅ Token-based authentication with Base44
-- ✅ No credentials stored in code
-- ✅ HTTPS required for production
-- ✅ Input sanitization for user messages
-- ✅ Secure token handling via SDK
+- **Environment Variables**: Never commit `.env` files
+- **Token Handling**: Tokens stored in localStorage with secure flags
+- **API Security**: All requests go through Base44 SDK with authentication
+- **Input Sanitization**: User inputs are sanitized before LLM processing
 
-### Reporting Vulnerabilities
+### Vulnerability Management
 
-Please report security vulnerabilities to the maintainers directly. Do not open public issues for security concerns.
+```bash
+# Check for vulnerabilities
+npm audit
+
+# Auto-fix non-breaking issues
+npm audit fix
+
+# Review and fix all issues (may have breaking changes)
+npm audit fix --force
+```
+
+## 🧪 Testing
+
+*Note: Test infrastructure is planned for future releases*
+
+Planned testing approach:
+- **Unit Tests**: Jest + React Testing Library
+- **Integration Tests**: Playwright/Cypress for E2E
+- **Accessibility**: axe-core for a11y compliance
+
+## 📊 Performance
+
+### Optimizations
+
+- **Code Splitting**: Vite's automatic chunking
+- **Lazy Loading**: React.lazy for route-based splitting (future)
+- **Memoization**: React.memo and useMemo for expensive operations
+- **CSS Animations**: GPU-accelerated transforms
+- **Bundle Size**: ~500KB gzipped (with dependencies)
+
+### Browser Support
+
+| Browser | Version | Status |
+|---------|---------|--------|
+| Chrome | >= 88 | ✅ Full support |
+| Edge | >= 88 | ✅ Full support |
+| Safari | >= 14.1 | ✅ Full support |
+| Firefox | >= 78 | ⚠️ Limited (no Web Speech API) |
 
 ## 🤝 Contributing
 
-We welcome contributions! Please follow these guidelines:
+We welcome contributions! Please see [CONTRIBUTING.md](./docs/CONTRIBUTING.md) for detailed guidelines.
 
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
-3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
-4. **Push** to the branch (`git push origin feature/amazing-feature`)
-5. **Open** a Pull Request
+### Quick Start for Contributors
 
-### Contribution Guidelines
+1. Fork the repository
+2. Create your feature branch
+3. Make your changes following code style guidelines
+4. Test thoroughly
+5. Submit a pull request
 
-- Write clear, descriptive commit messages
-- Follow existing code style and conventions
-- Add JSDoc comments for new functions
-- Update documentation for new features
-- Test your changes thoroughly
-- Keep PRs focused and atomic
+## 📝 Changelog
 
-## 📋 Roadmap
+See [CHANGELOG.md](./CHANGELOG.md) for a detailed history of changes.
 
-See [ROADMAP.md](./ROADMAP.md) for detailed plans.
+## 🗺️ Roadmap
 
-### Short-term (v0.1 - MVP)
-- ✅ Voice recognition and synthesis
-- ✅ Basic conversational AI
-- ✅ User preferences and settings
-- 🔄 Comprehensive testing suite
-- 📋 CI/CD pipeline
-
-### Mid-term (v0.5)
-- 📋 Multi-language support
-- 📋 Advanced context management
-- 📋 Integration with external APIs
-- 📋 Mobile app (React Native)
-- 📋 Voice command shortcuts
-
-### Long-term (v1.0+)
-- 📋 Custom wake word detection
-- 📋 Emotion detection in voice
-- 📋 Multi-user support
-- 📋 Plugin/extension system
-- 📋 Advanced analytics dashboard
+See [ROADMAP.md](./ROADMAP.md) for planned features and improvements.
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👥 Team
-
-**Project Maintainer**: [@Krosebrook](https://github.com/Krosebrook)
+This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
-- **Base44** - For the powerful AI platform and SDK
-- **Radix UI** - For accessible component primitives
-- **Tailwind CSS** - For utility-first styling
-- **Web Speech API** - For speech recognition and synthesis
-- **React Community** - For excellent tools and libraries
+- **Base44 Platform** - Backend infrastructure and AI services
+- **Radix UI** - Accessible component primitives
+- **Tailwind CSS** - Utility-first styling
+- **Three.js** - 3D particle effects
+- **Lucide Icons** - Beautiful icon set
 
 ## 📞 Support
 
-- **Documentation**: [GitHub Wiki](https://github.com/Krosebrook/tessa-ai/wiki)
 - **Issues**: [GitHub Issues](https://github.com/Krosebrook/tessa-ai/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/Krosebrook/tessa-ai/discussions)
+- **Email**: support@base44.com
+
+## 👥 Team
+
+- **Lead Developer**: [@Krosebrook](https://github.com/Krosebrook)
 
 ---
 
-**Made with ❤️ and AI**
+**Built with ❤️ using React and the Base44 Platform**
