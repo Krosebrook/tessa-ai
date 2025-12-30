@@ -33,12 +33,12 @@ export const useSpeechSynthesis = ({
         const availableVoices = synthRef.current.getVoices();
         setVoices(availableVoices);
 
-        // Auto-select a preferred voice
+        // Auto-select a preferred voice based on configured preferences
         const preferredVoice = 
           availableVoices.find(v => v.name === voiceSettings.preferred_voice_name) ||
-          availableVoices.find(v => v.name.includes('Google US English Female')) ||
-          availableVoices.find(v => v.name.includes('Samantha')) ||
-          availableVoices.find(v => v.name.includes('Female') && v.lang.startsWith('en')) ||
+          availableVoices.find(v => v.name.includes(VOICE_SETTINGS.PREFERRED_VOICE_NAMES[0])) ||
+          availableVoices.find(v => v.name.includes(VOICE_SETTINGS.PREFERRED_VOICE_NAMES[1])) ||
+          availableVoices.find(v => v.name.includes(VOICE_SETTINGS.PREFERRED_VOICE_NAMES[2]) && v.lang.startsWith('en')) ||
           availableVoices.find(v => v.lang.startsWith('en'));
         
         setSelectedVoice(preferredVoice);

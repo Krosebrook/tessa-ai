@@ -17,6 +17,11 @@ export const VOICE_SETTINGS = {
   SPEECH_RATE_STEP: 0.1,
   PITCH_STEP: 0.1,
   VOLUME_STEP: 0.1,
+  PREFERRED_VOICE_NAMES: [
+    'Google US English Female',
+    'Samantha',
+    'Female', // Fallback pattern
+  ],
 };
 
 // Speech Recognition Settings
@@ -33,6 +38,8 @@ export const AGENT_CONFIG = {
   CONTEXT_WINDOW_SIZE: 6, // Number of recent messages to include
   DEFAULT_GREETING: "Hi! I'm Tessa, your personal assistant. How can I help you today?",
   GREETING_DELAY: 1500, // ms to wait before initial greeting
+  SESSION_NAME: 'Tessa Session',
+  SESSION_DESCRIPTION_TEMPLATE: 'Personal assistant session for {name}',
 };
 
 // Status Messages
@@ -68,6 +75,7 @@ export const UI_CONFIG = {
 };
 
 // Storage Keys
+// Used for browser localStorage and sessionStorage
 export const STORAGE_KEYS = {
   ACCESS_TOKEN: 'base44_access_token',
   APP_ID: 'base44_app_id',
@@ -97,6 +105,13 @@ export const BROWSER_REQUIREMENTS = {
   MIN_FIREFOX_VERSION: 78,
 };
 
+// External Links
+export const EXTERNAL_LINKS = {
+  GITHUB_ISSUES: 'https://github.com/Krosebrook/tessa-ai/issues',
+  SUPPORT_EMAIL: 'support@base44.com',
+  DOCUMENTATION: 'https://github.com/Krosebrook/tessa-ai/tree/main/docs',
+};
+
 export default {
   VOICE_SETTINGS,
   SPEECH_RECOGNITION,
@@ -109,4 +124,5 @@ export default {
   CONVERSATION_CONFIG,
   PERFORMANCE_TARGETS,
   BROWSER_REQUIREMENTS,
+  EXTERNAL_LINKS,
 };

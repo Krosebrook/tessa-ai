@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Button } from '@/components/ui/button';
+import { EXTERNAL_LINKS } from '@/lib/constants';
 
 /**
  * Error Boundary component to catch and handle React errors gracefully
@@ -126,7 +127,7 @@ class ErrorBoundary extends Component {
                   variant="link"
                   onClick={() => {
                     // Navigate to issue reporting or contact support
-                    window.open('https://github.com/Krosebrook/tessa-ai/issues', '_blank');
+                    window.open(EXTERNAL_LINKS.GITHUB_ISSUES, '_blank');
                   }}
                   className="mt-4 text-purple-300 hover:text-purple-200"
                 >
