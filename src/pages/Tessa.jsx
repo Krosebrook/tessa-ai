@@ -2,9 +2,25 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import HudCircle from '../components/tessa/HudCircle';
 import TypingMessage from '../components/tessa/TypingMessage';
 import SettingsPanel from '../components/tessa/SettingsPanel';
+import SpeechApiCheck from '../components/SpeechApiCheck';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Settings } from 'lucide-react';
+import { 
+  isSpeechRecognitionAvailable,
+  isSpeechSynthesisAvailable,
+  withRetry,
+  withTimeout,
+  getUserFriendlyErrorMessage,
+  shouldRetryError,
+  handleSpeechRecognitionError,
+  isOnline
+} from '@/utils/errorHandling';
+import { 
+  AGENT_CONFIG, 
+  STATUS_MESSAGES, 
+  API_CONFIG
+} from '@/lib/constants';
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition;
@@ -16,6 +32,7 @@ if (SpeechRecognition) {
 }
 
 const TessaPage = () => {
+  const [showSpeechApiWarning, setShowSpeechApiWarning] = useState(false);
   const [conversation, setConversation] = useState([]);
   const [tessaStatus, setTessaStatus] = useState('Initializing...');
   const [isListening, setIsListening] = useState(false);
@@ -33,6 +50,13 @@ const TessaPage = () => {
   
   const initialGreetingSpoken = useRef(false);
   const synth = window.speechSynthesis;
+
+  // Check for Speech API support on mount
+  useEffect(() => {
+    if (!isSpeechRecognitionAvailable() || !isSpeechSynthesisAvailable()) {
+      setShowSpeechApiWarning(true);
+    }
+  }, []);
 
   useEffect(() => {
     const loadVoices = () => {
@@ -182,18 +206,36 @@ const TessaPage = () => {
   const processUserInput = useCallback(async (userText) => {
     if (!conversationId || isProcessing) return;
     
+    // Check if online before processing
+    if (!isOnline()) {
+      const errorMsg = "You're offline. Please check your internet connection.";
+      addMessageToConversation('tessa', errorMsg, true);
+      if (isSpeechSynthesisAvailable()) {
+        speak(errorMsg);
+      }
+      return;
+    }
+    
     setIsProcessing(true);
-    setTessaStatus('Thinking...');
+    setTessaStatus(STATUS_MESSAGES.THINKING);
     
     try {
-      const conversationData = await base44.agents.getConversation(conversationId);
+      // Get conversation with retry logic
+      const conversationData = await withRetry(
+        () => base44.agents.getConversation(conversationId),
+        {
+          maxRetries: API_CONFIG.MAX_RETRIES,
+          initialDelay: API_CONFIG.RETRY_DELAY,
+          shouldRetry: shouldRetryError
+        }
+      );
       
       await base44.agents.addMessage(conversationData, {
         role: 'user',
         content: userText
       });
       
-      const recentMessages = conversation.slice(-6).map(msg => ({
+      const recentMessages = conversation.slice(-AGENT_CONFIG.CONTEXT_WINDOW_SIZE).map(msg => ({
         role: msg.sender === 'user' ? 'user' : 'assistant',
         content: msg.text
       }));
@@ -207,10 +249,22 @@ User: ${userText}
 
 Respond naturally and helpfully. Keep responses concise but warm.`;
 
-      const response = await base44.integrations.Core.InvokeLLM({
-        prompt: contextPrompt,
-        add_context_from_internet: false
-      });
+      // Call LLM with timeout and retry
+      const response = await withTimeout(
+        () => withRetry(
+          () => base44.integrations.Core.InvokeLLM({
+            prompt: contextPrompt,
+            add_context_from_internet: false
+          }),
+          {
+            maxRetries: API_CONFIG.MAX_RETRIES,
+            initialDelay: API_CONFIG.RETRY_DELAY,
+            shouldRetry: shouldRetryError
+          }
+        ),
+        API_CONFIG.LLM_TIMEOUT,
+        'LLM request timed out'
+      );
       
       const tessaResponse = response || "I'm sorry, I didn't quite understand that. Could you rephrase?";
       
@@ -226,24 +280,39 @@ Respond naturally and helpfully. Keep responses concise but warm.`;
       
     } catch (error) {
       console.error('Error processing user input:', error);
-      const errorMsg = "I'm having trouble processing that right now. Could you try again?";
+      
+      // Get user-friendly error message
+      const errorMsg = getUserFriendlyErrorMessage(error);
       addMessageToConversation('tessa', errorMsg, true);
-      speak(errorMsg);
+      
+      if (isSpeechSynthesisAvailable()) {
+        speak(errorMsg);
+      }
     } finally {
       setIsProcessing(false);
+      setTessaStatus(STATUS_MESSAGES.READY);
     }
   }, [conversationId, isProcessing, conversation, addMessageToConversation, speak, startListening]);
 
   useEffect(() => {
     if (!initialGreetingSpoken.current && conversationId) {
       const greetingTimeout = setTimeout(() => {
-        const greeting = "Hi! I'm Tessa, your personal assistant. How can I help you today?";
+        const greeting = AGENT_CONFIG.DEFAULT_GREETING;
         addMessageToConversation('tessa', greeting, true);
-        speak(greeting, () => {
-          startListening();
-        });
+        if (isSpeechSynthesisAvailable()) {
+          speak(greeting, () => {
+            if (isSpeechRecognitionAvailable()) {
+              startListening();
+            }
+          });
+        } else {
+          // If no speech synthesis, at least start listening
+          if (isSpeechRecognitionAvailable()) {
+            startListening();
+          }
+        }
         initialGreetingSpoken.current = true;
-      }, 1500);
+      }, AGENT_CONFIG.GREETING_DELAY);
 
       return () => clearTimeout(greetingTimeout);
     }
@@ -269,8 +338,28 @@ Respond naturally and helpfully. Keep responses concise but warm.`;
 
       recognition.onerror = (event) => {
         console.error('Speech recognition error', event.error);
+        
+        // Handle error with appropriate action
+        const errorHandling = handleSpeechRecognitionError(event);
+        
         setIsListening(false);
-        setTessaStatus('Ready to help');
+        
+        // Show user-friendly message if needed
+        if (errorHandling.message) {
+          addMessageToConversation('tessa', errorHandling.message, true);
+          if (isSpeechSynthesisAvailable()) {
+            speak(errorHandling.message);
+          }
+        }
+        
+        // Restart recognition if appropriate
+        if (errorHandling.shouldRestart && isSpeechRecognitionAvailable()) {
+          setTimeout(() => {
+            startListening();
+          }, 1000);
+        } else {
+          setTessaStatus(STATUS_MESSAGES.READY);
+        }
       };
       
       recognition.onend = () => {
@@ -308,7 +397,12 @@ Respond naturally and helpfully. Keep responses concise but warm.`;
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen w-full text-white p-4">
+    <>
+      {showSpeechApiWarning && (
+        <SpeechApiCheck onDismiss={() => setShowSpeechApiWarning(false)} />
+      )}
+      
+      <div className="flex flex-col items-center justify-center h-screen w-full text-white p-4">
       <Button
         variant="ghost"
         size="icon"
@@ -352,7 +446,8 @@ Respond naturally and helpfully. Keep responses concise but warm.`;
           onSettingsUpdate={handleSettingsUpdate}
         />
       )}
-    </div>
+      </div>
+    </>
   );
 };
 
