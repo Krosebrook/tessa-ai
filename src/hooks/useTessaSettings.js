@@ -85,12 +85,24 @@ const useTessaSettings = () => {
     }
   };
 
+  /**
+   * Update and save settings
+   * @param {Object} newSettings - New settings to apply
+   * @returns {Promise<boolean>} Success status
+   */
+  const updateSettings = async (newSettings) => {
+    updatePreferences(newSettings);
+    return await savePreferences();
+  };
+
   return {
     voiceSettings,
     preferences,
+    settings: preferences, // Alias for easier access
     isLoading,
     updateVoiceSettings,
     updatePreferences,
+    updateSettings,
     savePreferences
   };
 };
