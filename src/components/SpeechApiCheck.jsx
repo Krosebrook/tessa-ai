@@ -81,6 +81,7 @@ const SpeechApiCheck = ({ onDismiss }) => {
             <Button
               onClick={() => window.location.reload()}
               className="bg-gradient-to-r from-purple-600 to-rose-600 hover:from-purple-500 hover:to-rose-500"
+              aria-label="Refresh page to check for Speech API support"
             >
               Refresh Page
             </Button>

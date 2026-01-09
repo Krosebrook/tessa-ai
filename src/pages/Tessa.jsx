@@ -187,11 +187,15 @@ const TessaPage = () => {
   }, [isListening, isSpeaking, isProcessing]);
 
   /**
-   * Handle settings updates
+   * Handle settings updates with error handling
    * @param {Object} newSettings - Updated settings
    */
   const handleSettingsUpdate = async (newSettings) => {
-    await updateSettings(newSettings);
+    const success = await updateSettings(newSettings);
+    if (!success) {
+      // Could add toast notification here in the future
+      console.error('Failed to update settings');
+    }
   };
 
   /**

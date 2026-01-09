@@ -28,7 +28,7 @@ const useTessaConversation = () => {
       try {
         const user = await base44.auth.me();
         const conversations = await base44.agents.listConversations({
-          agent_name: 'tessa_assistant'
+          agent_name: AGENT_CONFIG.NAME
         });
         
         if (conversations && conversations.length > 0) {
@@ -45,10 +45,10 @@ const useTessaConversation = () => {
           }
         } else {
           const newConversation = await base44.agents.createConversation({
-            agent_name: 'tessa_assistant',
+            agent_name: AGENT_CONFIG.NAME,
             metadata: {
-              name: 'Tessa Session',
-              description: `Personal assistant session for ${user.full_name}`
+              name: AGENT_CONFIG.SESSION_NAME,
+              description: AGENT_CONFIG.SESSION_DESCRIPTION_TEMPLATE.replace('{name}', user.full_name)
             }
           });
           setConversationId(newConversation.id);
@@ -172,10 +172,10 @@ Respond naturally and helpfully. Keep responses concise but warm.`;
     try {
       const user = await base44.auth.me();
       const newConversation = await base44.agents.createConversation({
-        agent_name: 'tessa_assistant',
+        agent_name: AGENT_CONFIG.NAME,
         metadata: {
-          name: 'Tessa Session',
-          description: `Personal assistant session for ${user.full_name}`
+          name: AGENT_CONFIG.SESSION_NAME,
+          description: AGENT_CONFIG.SESSION_DESCRIPTION_TEMPLATE.replace('{name}', user.full_name)
         }
       });
       setConversationId(newConversation.id);

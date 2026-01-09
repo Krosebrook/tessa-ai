@@ -219,7 +219,7 @@ export const handleSpeechRecognitionError = (event) => {
  * @returns {Function} Debounced function
  */
 export const debounce = (fn, delay = 300) => {
-  let timeoutId;
+  let timeoutId = null;
   return (...args) => {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => fn(...args), delay);
