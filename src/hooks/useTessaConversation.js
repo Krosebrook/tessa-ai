@@ -1,5 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { base44 } from '@/api/base44Client';
+import { 
+  withRetry, 
+  withTimeout, 
+  getUserFriendlyErrorMessage,
+  shouldRetryError 
+} from '@/utils/errorHandling';
+import { AGENT_CONFIG, API_CONFIG } from '@/lib/constants';
 
 /**
  * Custom hook for managing conversation state with Base44 Agents
@@ -21,7 +28,7 @@ const useTessaConversation = () => {
       try {
         const user = await base44.auth.me();
         const conversations = await base44.agents.listConversations({
-          agent_name: 'tessa_assistant'
+          agent_name: AGENT_CONFIG.NAME
         });
         
         if (conversations && conversations.length > 0) {
@@ -38,10 +45,10 @@ const useTessaConversation = () => {
           }
         } else {
           const newConversation = await base44.agents.createConversation({
-            agent_name: 'tessa_assistant',
+            agent_name: AGENT_CONFIG.NAME,
             metadata: {
-              name: 'Tessa Session',
-              description: `Personal assistant session for ${user.full_name}`
+              name: AGENT_CONFIG.SESSION_NAME,
+              description: AGENT_CONFIG.SESSION_DESCRIPTION_TEMPLATE.replace('{name}', user.full_name)
             }
           });
           setConversationId(newConversation.id);
@@ -83,6 +90,7 @@ const useTessaConversation = () => {
 
   /**
    * Process user input with LLM and get response
+   * Includes timeout and retry logic for reliability
    * @param {string} userText - User's voice input
    * @returns {Promise<string>} Tessa's response
    */
@@ -92,15 +100,23 @@ const useTessaConversation = () => {
     setIsProcessing(true);
     
     try {
-      const conversationData = await base44.agents.getConversation(conversationId);
+      // Get conversation with retry logic
+      const conversationData = await withRetry(
+        () => base44.agents.getConversation(conversationId),
+        {
+          maxRetries: API_CONFIG.MAX_RETRIES,
+          initialDelay: API_CONFIG.RETRY_DELAY,
+          shouldRetry: shouldRetryError
+        }
+      );
       
       await base44.agents.addMessage(conversationData, {
         role: 'user',
         content: userText
       });
       
-      // Use configured context window size from config
-      const contextSize = 6; // TODO: Import from tessa.config.js
+      // Use configured context window size
+      const contextSize = AGENT_CONFIG.CONTEXT_WINDOW_SIZE;
       const recentMessages = conversation.slice(-contextSize).map(msg => ({
         role: msg.sender === 'user' ? 'user' : 'assistant',
         content: msg.text
@@ -115,10 +131,22 @@ User: ${userText}
 
 Respond naturally and helpfully. Keep responses concise but warm.`;
 
-      const response = await base44.integrations.Core.InvokeLLM({
-        prompt: contextPrompt,
-        add_context_from_internet: false
-      });
+      // Call LLM with timeout and retry
+      const response = await withTimeout(
+        () => withRetry(
+          () => base44.integrations.Core.InvokeLLM({
+            prompt: contextPrompt,
+            add_context_from_internet: false
+          }),
+          {
+            maxRetries: API_CONFIG.MAX_RETRIES,
+            initialDelay: API_CONFIG.RETRY_DELAY,
+            shouldRetry: shouldRetryError
+          }
+        ),
+        API_CONFIG.LLM_TIMEOUT,
+        'LLM request timed out'
+      );
       
       const tessaResponse = response || "I'm sorry, I didn't quite understand that. Could you rephrase?";
       
@@ -130,7 +158,8 @@ Respond naturally and helpfully. Keep responses concise but warm.`;
       return tessaResponse;
     } catch (error) {
       console.error('Error processing user input:', error);
-      return "I'm having trouble processing that right now. Could you try again?";
+      // Return user-friendly error message
+      return getUserFriendlyErrorMessage(error);
     } finally {
       setIsProcessing(false);
     }
@@ -143,10 +172,10 @@ Respond naturally and helpfully. Keep responses concise but warm.`;
     try {
       const user = await base44.auth.me();
       const newConversation = await base44.agents.createConversation({
-        agent_name: 'tessa_assistant',
+        agent_name: AGENT_CONFIG.NAME,
         metadata: {
-          name: 'Tessa Session',
-          description: `Personal assistant session for ${user.full_name}`
+          name: AGENT_CONFIG.SESSION_NAME,
+          description: AGENT_CONFIG.SESSION_DESCRIPTION_TEMPLATE.replace('{name}', user.full_name)
         }
       });
       setConversationId(newConversation.id);
